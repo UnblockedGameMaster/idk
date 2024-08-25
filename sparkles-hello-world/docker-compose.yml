@@ -1,31 +1,43 @@
-name: linuxserver-freetube
+version: "3"
 services:
-  app:
+  freetube:
     image: linuxserver/freetube:version-168465262
-    restart: unless-stopped
+    container_name: freetube
     environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
-    x-casaos:
-      envs:
-        - container: PUID
-          description:
-            en_us: for UserID
-        - container: PGID
-          description:
-            en_us: for GroupID
-        - container: TZ
-          description:
-            en_us: specify a timezone to use, see this list.
-    ports:
-      - target: 3000
-        published: 3000
-        protocol: tcp
-      - target: 3001
-        published: 3001
-        protocol: tcp
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - type: bind
-        source: /DATA/AppData/freetube/config
-        target: /config
+      - ${APP_DATA_DIR}/freetube/config:/config
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    restart: unless-stopped
+x-umbrel:
+  title: Freetube
+  version: "168465262"
+  description: FreeTube is a feature-rich and user-friendly YouTube client with a focus on privacy.
+  developer: LinuxServer.io
+  repository: https://github.com/linuxserver/docker-freetube
+  category: Media
+  icon: https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/freetube-logo.png
+  support:
+    url: https://github.com/linuxserver/docker-freetube/issues
+  environment:
+    - variable: PUID
+      description: User ID for file permissions
+    - variable: PGID
+      description: Group ID for file permissions
+    - variable: TZ
+      description: Timezone setting
+  ports:
+    - description: HTTP Port
+      published: 3000
+      target: 3000
+    - description: Secondary Port
+      published: 3001
+      target: 3001
+  volumes:
+    - description: Configuration storage
+      source: ${APP_DATA_DIR}/freetube/config
+      target: /config
