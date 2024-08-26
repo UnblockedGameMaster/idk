@@ -1,19 +1,47 @@
-version: "3.7"
-
+version: "3"
 services:
-
-  app_proxy:
+  freetube:
+    image: linuxserver/freetube:version-168465262
+    container_name: freetube
     environment:
-      APP_HOST: homebox_web_1
-      APP_PORT: 7745
-    
-  web:
-    image: ghcr.io/hay-kot/homebox:v0.10.3-rootless@sha256:cc6e3b7fa40e3259cb8cac8e5d3e594eb63a68abd16c51029d59460f7fed1212
-    restart: on-failure
-    user: 1000:1000
-    environment:
-      - HBOX_LOG_LEVEL=info
-      - HBOX_LOG_FORMAT=text
-      - HBOX_WEB_MAX_UPLOAD_SIZE=10
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - ${APP_DATA_DIR}/data:/data/
+      - ${APP_DATA_DIR}/freetube/config:/config
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    restart: unless-stopped
+
+umbrel:
+  title: Freetube
+  version: "168465262"
+  description: >
+    FreeTube is a feature-rich and user-friendly YouTube client with a focus on privacy.
+  developer: LinuxServer.io
+  repository: https://github.com/linuxserver/docker-freetube
+  category: media
+  icon: https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/freetube-logo.png
+  website: https://github.com/FreeTubeApp/FreeTube
+  support: https://github.com/linuxserver/docker-freetube/issues
+  volumes:
+    - name: config
+      mount: /config
+      description: Configuration storage
+  ports:
+    - name: web
+      target: 3000
+      published: 3000
+      description: Web UI
+    - name: secondary
+      target: 3001
+      published: 3001
+      description: Secondary port
+  env:
+    - name: PUID
+      description: User ID for file permissions
+    - name: PGID
+      description: Group ID for file permissions
+    - name: TZ
+      description: Timezone setting
